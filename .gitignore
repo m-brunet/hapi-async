@@ -1,5 +1,6 @@
 # Local file
 node_modules
+report
 
 # IDE Files
 .idea
