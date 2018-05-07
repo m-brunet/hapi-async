@@ -1,0 +1,6 @@
+# Local file
+node_modules
+
+# IDE Files
+.idea
+.vscode
