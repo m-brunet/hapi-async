@@ -1,6 +1,5 @@
 const Lab = require('lab');
 const sinon = require('sinon');
-const Code = require('code');
 
 const lab = exports.lab = Lab.script();
 

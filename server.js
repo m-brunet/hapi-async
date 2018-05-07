@@ -1,9 +1,11 @@
 const Hapi = require('hapi');
+
 const log = require('./utils/helpers/log.helpers');
+const config = require('./config');
 
 const server = Hapi.server({
-    host: 'localhost',
-    port: 3000
+    host: config.host,
+    port: config.port
 });
 
 const startServer = async () => {
