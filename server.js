@@ -1,4 +1,5 @@
 const Hapi = require('hapi');
+const log = require('./utils/helpers/log.helpers');
 
 const server = Hapi.server({
     host: 'localhost',
@@ -6,7 +7,13 @@ const server = Hapi.server({
 });
 
 const startServer = async () => {
-    await server.start();
+    try {
+        await server.start();
+
+        log.info(`Server listening on ${server.info.uri}`);
+    } catch (err) {
+        log.error(err);
+    }
 };
 
 startServer();

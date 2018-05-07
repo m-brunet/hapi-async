@@ -19,15 +19,15 @@ lab.describe('Testing server initialization', () => {
 
     lab.test('server method should be called once', () => {
         require('../server');
-        const { server } = require('./mocks/hapi.mocks');
+        const mock = require('./mocks/hapi.mocks');
 
-        sinon.assert.calledOnce(server);
+        sinon.assert.calledOnce(mock.server);
     });
 
     lab.test('server method should received proper config parameters', () => {
         require('../server');
-        const { server } = require('./mocks/hapi.mocks');
-        const serverArg = server.args[0][0];
+        const mock = require('./mocks/hapi.mocks');
+        const serverArg = mock.server.args[0][0];
 
         // TODO: Import from config file
         Code.expect(serverArg).to.be.an.object();
@@ -40,5 +40,15 @@ lab.describe('Testing server initialization', () => {
         const { start } = require('./mocks/hapi.mocks');
 
         sinon.assert.calledOnce(start);
+    });
+
+    lab.test('should display exception on error', () => {
+        const mock = require('./mocks/hapi.mocks');
+
+        mock.setError();
+
+        require('../server');
+
+        sinon.assert.calledOnce(mock.start);
     });
 });
