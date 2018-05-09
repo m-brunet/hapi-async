@@ -1,7 +1,7 @@
+const handlers = require('./health-checks.handlers');
+
 exports.getServerIsAliveRoute = {
     method: 'GET',
     path: '/api/hello',
-    handler: async () => {
-        return { isAlive: true };
-    }
+    handler: handlers.getServerIsAliveHandler
 };
