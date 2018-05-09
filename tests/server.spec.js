@@ -6,11 +6,10 @@ const Code = require('code');
 const lab = exports.lab = Lab.script();
 
 lab.describe('Testing server initialization', () => {
-    const stubHapiServer = (registerSpy, startSpy) => {
+    const stubHapiServer = (startSpy) => {
         return sinon
             .stub(require('hapi'), 'server')
             .returns({
-                register: registerSpy,
                 start: startSpy,
                 info: { uri: '' }
             });
@@ -38,14 +37,16 @@ lab.describe('Testing server initialization', () => {
 
     lab.test('should throw error if register method fails', async () => {
         const logMock = require('./mocks/log.helpers.mocks');
-        const registerSpy = sinon.stub().throws();
+        const registerStub = sinon
+            .stub(require('../utils/helpers/plugins.helpers'), 'registerPlugin')
+            .throws();
         const startSpy = sinon.stub();
-        const serverStub = stubHapiServer(registerSpy, startSpy);
+        const serverStub = stubHapiServer(startSpy);
 
         const server = require('../server');
         await server.startServer();
 
-        Code.expect(registerSpy.calledOnce).to.be.true();
+        Code.expect(registerStub.calledOnce).to.be.true();
         Code.expect(startSpy.notCalled).to.be.true();
         Code.expect(logMock.info.notCalled).to.be.true();
         Code.expect(logMock.error.calledOnce).to.be.true();
@@ -55,14 +56,14 @@ lab.describe('Testing server initialization', () => {
 
     lab.test('should throw error if start method fails', async () => {
         const logMock = require('./mocks/log.helpers.mocks');
-        const registerSpy = sinon.stub();
+        const registerStub = sinon.stub(require('../utils/helpers/plugins.helpers'), 'registerPlugin');
         const startSpy = sinon.stub().throws();
-        const serverStub = stubHapiServer(registerSpy, startSpy);
+        const serverStub = stubHapiServer(startSpy);
 
         const server = require('../server');
         await server.startServer();
 
-        Code.expect(registerSpy.calledOnce).to.be.true();
+        Code.expect(registerStub.calledOnce).to.be.true();
         Code.expect(startSpy.calledOnce).to.be.true();
         Code.expect(logMock.info.notCalled).to.be.true();
         Code.expect(logMock.error.calledOnce).to.be.true();
@@ -72,14 +73,14 @@ lab.describe('Testing server initialization', () => {
 
     lab.test('should call log if no method fails', async () => {
         const logMock = require('./mocks/log.helpers.mocks');
-        const registerSpy = sinon.stub();
+        const registerStub = sinon.stub(require('../utils/helpers/plugins.helpers'), 'registerPlugin');
         const startSpy = sinon.stub();
-        const serverStub = stubHapiServer(registerSpy, startSpy);
+        const serverStub = stubHapiServer(startSpy);
 
         const server = require('../server');
         await server.startServer();
 
-        Code.expect(registerSpy.calledOnce).to.be.true();
+        Code.expect(registerStub.calledOnce).to.be.true();
         Code.expect(startSpy.calledOnce).to.be.true();
         Code.expect(logMock.info.calledOnce).to.be.true();
         Code.expect(logMock.error.notCalled).to.be.true();
