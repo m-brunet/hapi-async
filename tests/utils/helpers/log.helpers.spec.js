@@ -1,5 +1,6 @@
 const Lab = require('lab');
 const sinon = require('sinon');
+const Code = require('code');
 
 const lab = exports.lab = Lab.script();
 
@@ -14,9 +15,10 @@ lab.describe('Testing log helpers', () => {
 
     lab.test('should call console error method', () => {
         const log = require('../../../utils/helpers/log.helpers');
-        sinon.spy(console, 'error');
+        const errorStub = sinon.stub(console, 'error');
         log.error('test');
 
-        sinon.assert.calledOnce(console.error);
+        Code.expect(errorStub.calledOnce).to.be.true();
+        // sinon.assert.calledOnce(console.error);
     });
 });

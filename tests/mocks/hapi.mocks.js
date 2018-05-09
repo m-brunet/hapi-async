@@ -9,7 +9,8 @@ const startMethodFailure = async () => {
 const startSpySuccess = sinon.spy(startMethodSuccess);
 const startSpyFailure = sinon.spy(startMethodFailure);
 const server = {
-    start: startSpySuccess
+    start: startSpySuccess,
+    register: async () => new Promise(resolve => resolve())
 };
 
 const serverMethod = ({ host, port }) => {

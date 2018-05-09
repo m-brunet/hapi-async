@@ -8,8 +8,9 @@ const server = Hapi.server({
     port: config.port
 });
 
-const startServer = async () => {
+exports.startServer = async () => {
     try {
+        await server.register();
         await server.start();
 
         log.info(`Server listening on ${server.info.uri}`);
@@ -17,5 +18,3 @@ const startServer = async () => {
         log.error(err);
     }
 };
-
-startServer();
