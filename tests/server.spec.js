@@ -6,49 +6,85 @@ const Code = require('code');
 const lab = exports.lab = Lab.script();
 
 lab.describe('Testing server initialization', () => {
+    const stubHapiServer = (startSpy) => {
+        return sinon
+            .stub(require('hapi'), 'server')
+            .returns({
+                start: startSpy,
+                info: { uri: '' }
+            });
+    };
+
     lab.beforeEach(() => {
         mockery.enable({ useCleanCache: true });
         mockery.warnOnUnregistered(false);
-        mockery.registerSubstitute('hapi', './tests/mocks/hapi.mocks');
+        mockery.registerSubstitute('./utils/helpers/log.helpers', './tests/mocks/log.helpers.mocks');
     });
 
     lab.afterEach(() => {
         mockery.disable();
-        mockery.deregisterSubstitute('hapi');
+        mockery.deregisterSubstitute('./utils/helpers/log.helpers');
     });
 
     lab.test('server method should be called once', () => {
+        const serverStub = sinon.stub(require('hapi'), 'server');
         require('../server');
-        const mock = require('./mocks/hapi.mocks');
 
-        sinon.assert.calledOnce(mock.server);
+        Code.expect(serverStub.calledOnce).to.be.true();
+
+        serverStub.restore();
     });
 
-    lab.test('server method should received proper config parameters', () => {
-        require('../server');
-        const mock = require('./mocks/hapi.mocks');
-        const serverArg = mock.server.args[0][0];
+    lab.test('should throw error if register method fails', async () => {
+        const logMock = require('./mocks/log.helpers.mocks');
+        const registerStub = sinon
+            .stub(require('../utils/helpers/plugins.helpers'), 'registerPlugin')
+            .throws();
+        const startSpy = sinon.stub();
+        const serverStub = stubHapiServer(startSpy);
 
-        // TODO: Import from config file
-        Code.expect(serverArg).to.be.an.object();
-        Code.expect(serverArg).to.includes({ host: 'localhost' });
-        Code.expect(serverArg).to.includes({ port: 3000 });
+        const server = require('../server');
+        await server.startServer();
+
+        Code.expect(registerStub.calledOnce).to.be.true();
+        Code.expect(startSpy.notCalled).to.be.true();
+        Code.expect(logMock.info.notCalled).to.be.true();
+        Code.expect(logMock.error.calledOnce).to.be.true();
+
+        serverStub.restore();
     });
 
-    lab.test('server method should be called once', () => {
-        require('../server');
-        const { start } = require('./mocks/hapi.mocks');
+    lab.test('should throw error if start method fails', async () => {
+        const logMock = require('./mocks/log.helpers.mocks');
+        const registerStub = sinon.stub(require('../utils/helpers/plugins.helpers'), 'registerPlugin');
+        const startSpy = sinon.stub().throws();
+        const serverStub = stubHapiServer(startSpy);
 
-        sinon.assert.calledOnce(start);
+        const server = require('../server');
+        await server.startServer();
+
+        Code.expect(registerStub.calledOnce).to.be.true();
+        Code.expect(startSpy.calledOnce).to.be.true();
+        Code.expect(logMock.info.notCalled).to.be.true();
+        Code.expect(logMock.error.calledOnce).to.be.true();
+
+        serverStub.restore();
     });
 
-    lab.test('should display exception on error', () => {
-        const mock = require('./mocks/hapi.mocks');
+    lab.test('should call log if no method fails', async () => {
+        const logMock = require('./mocks/log.helpers.mocks');
+        const registerStub = sinon.stub(require('../utils/helpers/plugins.helpers'), 'registerPlugin');
+        const startSpy = sinon.stub();
+        const serverStub = stubHapiServer(startSpy);
 
-        mock.setError();
+        const server = require('../server');
+        await server.startServer();
 
-        require('../server');
+        Code.expect(registerStub.calledOnce).to.be.true();
+        Code.expect(startSpy.calledOnce).to.be.true();
+        Code.expect(logMock.info.calledOnce).to.be.true();
+        Code.expect(logMock.error.notCalled).to.be.true();
 
-        sinon.assert.calledOnce(mock.start);
+        serverStub.restore();
     });
 });

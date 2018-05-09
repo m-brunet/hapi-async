@@ -2,10 +2,10 @@
   "name": "hapi-async",
   "version": "0.1.0",
   "description": "HAPI base server",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "lint": "eslint \"./**/*.js\"",
-    "start": "node server.js",
+    "start": "node index.js",
     "test": "lab ./tests/ --coverage-exclude tests -v -r console -o stdout -r html -o report/coverage.html -r lcov -o report/lcov.info"
   },
   "repository": {
@@ -32,6 +32,7 @@
     "eslint": "4.19.1",
     "lab": "15.4.1",
     "mockery": "2.1.0",
+    "proxyquire": "2.0.1",
     "sinon": "5.0.5"
   }
 }
