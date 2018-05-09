@@ -6,3 +6,6 @@ config/config.json
 # IDE Files
 .idea
 .vscode
+
+# OS Files
+.DS_Store
